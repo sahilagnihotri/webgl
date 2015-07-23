@@ -29,20 +29,36 @@ main()
 <script type="text/javascript" src="../common/initShaders.js"></script>
 <script type="text/javascript" src="../common/MV.js"></script>
 <script type="text/javascript" src="gasket.js"></script>
+<script src="../tools/webgl-debug.js"></script>
 </head>
 
 <body>
-<div>
-recursive steps  0 <input id="slider" type="range"
- min="0" max="5" step="1" value="0" />
- 5
- Twist Angle<input type = "text" id = "twistValue" style = "width.50px"></input>
+ <div>
+  Recursive steps  0 <input id="subDivideSlider" type="range" min=0 max=7 step=1 value=4/> 7
+ </div></br>
+ <div>
+  <label for="theta">Twist Angle</label>
+  <input type = "text" id = "twistValue" value= "45" style = "width.5px"></input> degrees
+ </div></br>
+ <div>Demo type
+ <select id="demoType">
+  <option value="triangle">triangle</option>
+  <option value="square">square</option>
+ </select>
+ </div></br>
+ <div>
+ <label>Fill type </label>
+ <select id="fill">
+  <option value="wire">wireframe</option>
+  <option value="solid">solid</option>
+ </select>
+ </div></br>
+ <div>
+  <input type="checkbox" name="type" value="gasket">Gasket
+  <button id="reset" onclick=reset()>reset</button>
 </div>
-<div>
-<!-- <button id="triangle-demo">Triangle demo</button>
- <button id="square-demo">Square demo</button> -->
-</div>
-<canvas id="gl-canvas" width="800" height="800">
+ </br>
+<canvas id="gl-canvas" width="600" height="600">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 </body>

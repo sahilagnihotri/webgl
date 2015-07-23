@@ -30,7 +30,8 @@ module.exports = function(grunt) {
           {src: [
               'common/**/*.js',
               'code/**/*.js',
-              'code/**/*.html'
+              'code/**/*.html',
+              'README.md'
             ],
             dest: 'dist/',
             expand: true

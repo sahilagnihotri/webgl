@@ -2,6 +2,6 @@
 
 It is practice/experiment repository.
 Using grunt for publishing, copying, cleaning, etc.
-Issues on /issues
+Issues on [issues pages](https://github.com/sahilagnihotri/webgl/issues)
 
-sahilagihotri
+[sahilagnihotri](http://sahilagnihotri.github.io/)

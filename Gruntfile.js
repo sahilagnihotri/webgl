@@ -31,6 +31,7 @@ module.exports = function(grunt) {
               'common/**/*.js',
               'code/**/*.js',
               'code/**/*.html',
+              'tools/webgl-debug.js',
               'README.md'
             ],
             dest: 'dist/',

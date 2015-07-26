@@ -116,9 +116,9 @@ window.onload = function init() {
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.lineWidth(lineWidth);
+//    gl.lineWidth(lineWidth);
     for(var i=0; i<numPolygons; i++) {
-  //      gl.lineWidth(widthMap[i]);
+        gl.lineWidth(widthMap[i]);
         gl.drawArrays( gl.LINE_STRIP, start[i], numIndices[i] );
     }
 }

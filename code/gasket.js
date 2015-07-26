@@ -272,7 +272,7 @@ function renderSquare()
     gl.clear( gl.COLOR_BUFFER_BIT );
 
     if (fillType === 'solid') {
-      gl.drawArrays( gl.TRIANGLES, 0, rotatedPoints.length );
+      gl.drawArrays( gl.TRIANGLE_STRIP, 0, rotatedPoints.length );
     }
 
     if (fillType === 'mesh') {

@@ -1,1 +1,5 @@
 node_modules/
+notes/
+.grunt/
+wip/
+#angelExamples/

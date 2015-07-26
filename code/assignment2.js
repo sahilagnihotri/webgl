@@ -7,13 +7,13 @@ var maxNumVertices  = 100000;
 var index = 0;
 var cindex = 0;
 var colors = [
-    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
-    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    vec4( 0.0, 1.0, 1.0, 1.0)   // cyan
+    vec3( 0.0, 0.0, 0.0 ),  // black
+    vec3( 1.0, 0.0, 0.0 ),  // red
+    vec3( 1.0, 1.0, 0.0 ),  // yellow
+    vec3( 0.0, 1.0, 0.0 ),  // green
+    vec3( 0.0, 0.0, 1.0 ),  // blue
+    vec3( 1.0, 0.0, 1.0 ),  // magenta
+    vec3( 0.0, 1.0, 1.0 )   // cyan
 ];
 var t = [];
 var numPolygons = 0;
@@ -26,6 +26,7 @@ var mousePressed = false;
 var ctx;
 var isGlIniatized;
 var lineWidth=4;
+var alpha = 0.8;
 
 window.onload = function init() {
     canvas = document.getElementById( "gl-canvas" );
@@ -40,6 +41,19 @@ window.onload = function init() {
 
   document.getElementById("color").onchange = function(event) {
     cindex = parseInt(event.target.value);
+    console.log(event.target.value);
+    render();
+  };
+
+  document.getElementById("transparency").onchange = function(event) {
+    alpha = event.target.value;
+    console.log(event.target.value);
+    render();
+  };
+
+  document.getElementById("lineWidth").onchange = function(event) {
+    lineWidth = parseInt(event.target.value);
+    widthMap[numPolygons] = lineWidth;
     console.log(event.target.value);
     render();
   };
@@ -71,7 +85,7 @@ window.onload = function init() {
           gl.bindBuffer( gl.ARRAY_BUFFER, bufferId );
           gl.bufferSubData(gl.ARRAY_BUFFER, 8*index, flatten(t));
 
-          t = vec4(colors[cindex]);
+          t = vec4(colors[cindex][0], colors[cindex][1], colors[cindex][2], alpha);
           gl.bindBuffer( gl.ARRAY_BUFFER, cBufferId );
           gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t));
           numIndices[numPolygons-1]++;
@@ -79,13 +93,6 @@ window.onload = function init() {
           render();
       }
     } );
-
-    document.getElementById("lineWidth").onchange = function(event) {
-      lineWidth = parseInt(event.target.value);
-      widthMap[numPolygons] = lineWidth;
-      console.log(event.target.value);
-      render();
-    };
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.8, 0.8, 0.8, 1.0 );

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Assignment 2 Painting with the Mouse</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+attribute vec4 vColor;
+varying vec4 fColor;
+
+void main()
+{
+    gl_Position = vPosition;
+    fColor = vColor;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+varying vec4 fColor;
+void main()
+{
+   gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../common/webgl-utils.js"></script>
+<script type="text/javascript" src="../common/initShaders.js"></script>
+<script type="text/javascript" src="../common/MV.js"></script>
+<script type="text/javascript" src="assignment2.js"></script>
+<script src="../tools/webgl-debug.js"></script>
+</head>
+
+<body>
+<div>
+<canvas id="gl-canvas" width="512"" height="512">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+</div>
+<div>
+Color
+<select id = "color">
+    <option value = "0">Black</option>
+    <option value = "1">Red</option>
+    <option value = "2">Yellow</option>
+    <option value = "3">Green</option>
+    <option value = "4">Blue</option>
+    <option value = "5">Magenta</option>
+    <option value = "6">Cyan</option>
+</select>
+<div>
+<!-- Line width  10 <input id="lineWidth" type="range" min=10 max=100 step=10 value=30/> 100 -->
+ Line Width
+ <select id = "lineWidth">
+     <option value = "1">1</option>
+     <option value = "2">2</option>
+     <option value = "3">3</option>
+     <option selected="selected" value = "4">4</option>
+     <option value = "5">5</option>
+     <option value = "6">6</option>
+     <option value = "7">7</option>
+     <option value = "8">8</option>
+     <option value = "9">9</option>
+    <option value = "10">10</option>
+    <option value = "11">11</option>
+    <option value = "12">12</option>
+    <option value = "13">13</option>
+    <option value = "14">14</option>
+    <option value = "15">15</option>
+    <option value = "16">16</option>
+ </select>
+</div></br>
+</div>
+</body>
+</html>

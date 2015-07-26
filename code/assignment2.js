@@ -46,13 +46,13 @@ window.onload = function init() {
 
     canvas.addEventListener("mousedown", function(event){
         mousePressed = true;
-        console.log("MouseDown");
+        numPolygons++;
+    //    console.log("MouseDown");
     } );
 
     canvas.addEventListener("mouseup", function(event){
       if((mousePressed === true) && (isGlIniatized === true))
       {
-        numPolygons++;
         numIndices[numPolygons] = 0;
         start[numPolygons] = index;
         widthMap[numPolygons] = lineWidth;
@@ -60,7 +60,7 @@ window.onload = function init() {
         t=[];
         mousePressed = false;
       }
-      console.log("MouseUP");
+    //  console.log("MouseUP");
     } );
 
     canvas.addEventListener("mousemove", function(event){
@@ -74,9 +74,9 @@ window.onload = function init() {
           t = vec4(colors[cindex]);
           gl.bindBuffer( gl.ARRAY_BUFFER, cBufferId );
           gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t));
-
-          numIndices[numPolygons]++;
+          numIndices[numPolygons-1]++;
           index++;
+          render();
       }
     } );
 
@@ -116,11 +116,11 @@ window.onload = function init() {
 
 function render() {
     gl.clear( gl.COLOR_BUFFER_BIT );
-//    gl.lineWidth(lineWidth);
     for(var i=0; i<numPolygons; i++) {
         gl.lineWidth(widthMap[i]);
         gl.drawArrays( gl.LINE_STRIP, start[i], numIndices[i] );
     }
+    window.requestAnimFrame(render);
 }
 
 ////////// Debug fxns //////////

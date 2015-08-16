@@ -11,6 +11,7 @@
   var gl,
     _canvas,
     _shapes = [],
+    editing = true,
     _camera = {
       modelViewMatrix: mat4(),
       theta: 0,
@@ -65,9 +66,18 @@
     gl.drawElements( gl.LINE_LOOP, shape.indices.length, gl.UNSIGNED_SHORT, 0 );
   };
 
-  function render(shapes, oneShape) {
+  var render = function(shapes, oneShape) {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    if (oneShape) {
+      renderShape(oneShape, true);
       renderShape(oneShape);
+    }
+
+    shapes.forEach(function(shape) {
+      renderShape(shape);
+    });
+
   };
 
   function addShape(shapeType) {
@@ -75,7 +85,11 @@
       shapeVI;
 
     shape.program = initShaders( gl, 'vertex-shader', 'fragment-shader' );
-    shapeVI = Shape.generate(shapeType);
+    if (editing) {
+      shapeVI = Shape.generate(shapeType, {outlineOnly: true});
+    } else {
+      shapeVI = Shape.generate(shapeType);
+    }
     shape.vertices = shapeVI.v;
     shape.indices = shapeVI.i;
 
@@ -87,12 +101,19 @@
       document.getElementById('rotateY').valueAsNumber,
       document.getElementById('rotateZ').valueAsNumber
     ];
-
+    if (editing) {
+      shape.scale = [
+        document.getElementById('scaleX').valueAsNumber * 1.1,
+        document.getElementById('scaleY').valueAsNumber * 1.1,
+        document.getElementById('scaleZ').valueAsNumber * 1.1
+      ];
+    } else {
       shape.scale = [
         document.getElementById('scaleX').valueAsNumber,
         document.getElementById('scaleY').valueAsNumber,
         document.getElementById('scaleZ').valueAsNumber
       ];
+    }
 
     shape.translate = [
       document.getElementById('translateX').valueAsNumber,
@@ -114,15 +135,29 @@
     modelView = mult(modelView, rx);
     modelView = mult(modelView, s);
     _camera.modelViewMatrix = modelView;
-    render();
+    render(_shapes);
   };
 
   function update(evt) {
     var shapeSelect = document.getElementById('shape');
     var shapeType = shapeSelect.options[shapeSelect.selectedIndex].value;
 
+    if (evt.target.id === 'commitShape' || evt.target.id === 'commitShapeIcon') {
+         editing = false;
+         _shapes.push(addShape(shapeType));
+         render(_shapes);
+
+         document.getElementById('commitShape').classList.add( 'toggle' );
+         document.getElementById('newShape').classList.remove( 'toggle' );
+         document.getElementById('editMessage').classList.add( 'toggle' );
+         document.getElementById('addMessage').classList.remove( 'toggle' );
+         document.getElementById('cameraControls').classList.remove( 'toggle' );
+
+         DomUtils.disableInputs();
+       }
+
     if (evt.target.id === 'newShape' || evt.target.id === 'newShapeIcon') {
-      _editing = true;
+      editing = true;
 
       DomUtils.enableInputs();
       setDefaults();
@@ -137,7 +172,7 @@
     }
 
     if (evt.target.id === 'clear' || evt.target.id === 'clearIcon') {
-      _editing = true;
+      editing = true;
       _shapes = [];
       setDefaults();
       edit();
@@ -146,12 +181,14 @@
   };
 
   var edit = function() {
+    if (editing) {
       var shapeSelect = document.getElementById('shape');
       var shapeType = shapeSelect.options[shapeSelect.selectedIndex].value;
       var shapeToEdit = addShape(shapeType);
 
       shapeToEdit.border = addShape(shapeType, true);
       render(_shapes, shapeToEdit);
+      }
   };
 
   var setDefaults = function() {
@@ -201,6 +238,21 @@
       // Register event handlers
       document.getElementById('settings').addEventListener('click', update);
       document.getElementById('settings').addEventListener('change', edit);
+
+  /*    document.getElementById("commitShape").onclick = function(event) {
+        console.log(event.target.value);
+        render(_shapes);
+        edit();
+      };
+
+      document.getElementById("newShape").onclick = function(event) {
+        console.log(event.target.value);
+        render(_shapes);
+        edit();
+        setDefaults();
+
+        };
+*/
 
       // Configure WebGL
       gl.viewport( 0, 0, _canvas.width, _canvas.height );

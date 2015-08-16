@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+  <title>Assignment 3: CAD-Like Program </title>
+  <link rel="stylesheet" href="css/assignment3.css">
+
   <script id="vertex-shader" type="x-shader/x-vertex">
   attribute vec4 vPosition;
   uniform vec3 theta;
@@ -37,19 +41,16 @@
   <script type="text/javascript" src="../common/webgl-utils.js"></script>
   <script type="text/javascript" src="../common/initShaders.js"></script>
   <script type="text/javascript" src="../common/MV.js"></script>
-
   <script type="text/javascript" src="../common/flatten.js"></script>
   <script type="text/javascript" src="shapes/primitives.js"></script>
   <script type="text/javascript" src="assignment3.js"></script>
 </head>
 
 <body class="assignment">
+  <h1>Webgl Assignment 3: CAD-Like Program</h1>
 
-  <header>
-    <h1>Assignment 3</h1>
-    <h2>Geometric CAD</h2>
-  </header>
-
+  <div id="container">
+  <div id="right">
   <section id="settings" class="settings side-controls">
     <div class="form-group">
       <label for="shape">Shape</label>
@@ -118,13 +119,13 @@
     <div class="form-group actions">
       <button id="clear" class="button button-small"><i id="clearIcon" class="fa fa-refresh icon"></i>Reset</button>
     </div>
-
   </section>
-
-    <div class="drawing-area">
+</div>
+    <div id="left">
       <canvas id="gl-canvas" width="800" height="700">
         Oops ... your browser doesn't support the HTML5 canvas element
       </canvas>
     </div>
+  </div>
 </body>
 </html>

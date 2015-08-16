@@ -1,159 +1,262 @@
-"use strict";
+(function(window) {
+   var Shape = {
+     generate: function(shapeName, opts) {
+       return window[shapeName].generate(opts);
+     }
+   };
+   window.Shape = Shape;
+ })(window);
 
-var canvas;
-var gl;
+(function(window, Shape) {
+  var gl,
+    _canvas,
+    _shapes = [],
+    _camera = {
+      modelViewMatrix: mat4(),
+      theta: 0,
+      phi: 0,
+      dz: 0,
+      sx: 1,
+      sy: 1,
+      sz: 1
+    },
+    _cameraRotationInc = 15,
+    _cameraDZInc = 0.5;
 
-var numTimesToSubdivide = 5;
+    var cindex = 0;
+    var colors = [
+        vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
+        vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
+        vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
+        vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
+        vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
+        vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
+        vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
+    ];
 
-var index = 0;
+  var renderShape = function(shape) {
+    gl.useProgram(shape.program);
+    // Load index data onto GPU
+    var iBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(shape.indices), gl.STATIC_DRAW);
 
-var pointsArray = [];
-var cindex = 0;
-var colors = [
-    vec3( 0.0, 0.0, 0.0 ),  // black
-    vec3( 1.0, 0.0, 0.0 ),  // red
-    vec3( 1.0, 1.0, 0.0 ),  // yellow
-    vec3( 0.0, 1.0, 0.0 ),  // green
-    vec3( 0.0, 0.0, 1.0 ),  // blue
-    vec3( 1.0, 0.0, 1.0 ),  // magenta
-    vec3( 0.0, 1.0, 1.0 )   // cyan
-];
-
-var near = -10;
-var far = 10;
-var radius = 6.0;
-var theta  = 0.0;
-var phi    = 0.0;
-var dr = 5.0 * Math.PI/180.0;
-
-var left = -2.0;
-var right = 2.0;
-var ytop = 2.0;
-var bottom = -2.0;
-
-var modelViewMatrix, projectionMatrix;
-var modelViewMatrixLoc, projectionMatrixLoc;
-var eye;
-const at = vec3(0.0, 0.0, 0.0);
-const up = vec3(0.0, 1.0, 0.0);
-
-function triangle(a, b, c) {
-     pointsArray.push(a);
-     pointsArray.push(b);
-     pointsArray.push(c);
-     index += 3;
-}
-
-function divideTriangle(a, b, c, count) {
-    if ( count > 0 ) {
-
-        var ab = normalize(mix( a, b, 0.5), true);
-        var ac = normalize(mix( a, c, 0.5), true);
-        var bc = normalize(mix( b, c, 0.5), true);
-
-        divideTriangle( a, ab, ac, count - 1 );
-        divideTriangle( ab, b, bc, count - 1 );
-        divideTriangle( bc, c, ac, count - 1 );
-        divideTriangle( ab, bc, ac, count - 1 );
-    }
-    else { // draw tetrahedron at end of recursion
-        triangle( a, b, c );
-    }
-}
-
-function tetrahedron(a, b, c, d, n) {
-    divideTriangle(a, b, c, n);
-    divideTriangle(d, c, b, n);
-    divideTriangle(a, d, b, n);
-    divideTriangle(a, c, d, n);
-}
-
-window.onload = function init() {
-    canvas = document.getElementById( "gl-canvas" );
-
-    gl = WebGLUtils.setupWebGL( canvas );
-    if ( !gl ) { alert( "WebGL isn't available" ); }
-
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.0, 0.5, 0.5, 1.0 );
-
-    //
-    //  Load shaders and initialize attribute buffers
-    //
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
-    gl.useProgram( program );
-
-    var va = vec4(0.0, 0.0, -1.0, 1);
-    var vb = vec4(0.0, 0.942809, 0.333333, 1);
-    var vc = vec4(-0.816497, -0.471405, 0.333333, 1);
-    var vd = vec4(0.816497, -0.471405, 0.333333, 1);
-
-    tetrahedron(va, vb, vc, vd, numTimesToSubdivide);
-
+    // Load vertex buffer onto GPU
     var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(shape.vertices), gl.STATIC_DRAW );
 
-    var vPosition = gl.getAttribLocation( program, "vPosition");
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray( vPosition);
+    var vPosition = gl.getAttribLocation( shape.program, 'vPosition' );
+    gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
 
-    var cBufferId = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBufferId );
-    gl.bufferData( gl.ARRAY_BUFFER,flatten(pointsArray) , gl.STATIC_DRAW );
-    var vColor = gl.getAttribLocation( program, "vColor" );
-    gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vColor );
+    var colorLoc = gl.getUniformLocation(shape.program, 'fColor');
+    var thetaLoc = gl.getUniformLocation(shape.program, 'theta');
+    var scaleLoc = gl.getUniformLocation(shape.program, 'scale');
+    var translateLoc = gl.getUniformLocation(shape.program, 'translate');
+    var modelViewMatrixLoc = gl.getUniformLocation(shape.program, "modelViewMatrix" );
 
-    modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
-    projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
+    gl.uniform3fv(thetaLoc, shape.theta);
+    gl.uniform3fv(scaleLoc, shape.scale);
+    gl.uniform3fv(translateLoc, shape.translate);
+    gl.uniform4fv(colorLoc, shape.color);
+    gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(_camera.modelViewMatrix) );
 
-    document.getElementById("Button0").onclick = function(){theta += dr;};
-    document.getElementById("Button1").onclick = function(){theta -= dr;};
-    document.getElementById("Button2").onclick = function(){phi += dr;};
-    document.getElementById("Button3").onclick = function(){phi -= dr;};
+    gl.drawElements( gl.LINE_LOOP, shape.indices.length, gl.UNSIGNED_SHORT, 0 );
+  };
 
-    document.getElementById("Button4").onclick = function(){
-        numTimesToSubdivide++;
-        index = 0;
-        pointsArray = [];
-        init();
-    };
-    document.getElementById("Button5").onclick = function(){
-        if(numTimesToSubdivide) numTimesToSubdivide--;
-        index = 0;
-        pointsArray = [];
-        init();
-    };
-    document.getElementById("color").onchange = function(event) {
-      cindex = parseInt(event.target.value);
-      console.log(event.target.value);
-      render();
-    };
+  function render(shapes, oneShape) {
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      renderShape(oneShape);
+  };
+
+  function addShape(shapeType) {
+    var shape = {type: shapeType},
+      shapeVI;
+
+    shape.program = initShaders( gl, 'vertex-shader', 'fragment-shader' );
+    shapeVI = Shape.generate(shapeType);
+    shape.vertices = shapeVI.v;
+    shape.indices = shapeVI.i;
+
+    var i = (document.getElementById('color').value);
+    shape.color = colors[i];
+
+    shape.theta = [
+      document.getElementById('rotateX').valueAsNumber,
+      document.getElementById('rotateY').valueAsNumber,
+      document.getElementById('rotateZ').valueAsNumber
+    ];
+
+      shape.scale = [
+        document.getElementById('scaleX').valueAsNumber,
+        document.getElementById('scaleY').valueAsNumber,
+        document.getElementById('scaleZ').valueAsNumber
+      ];
+
+    shape.translate = [
+      document.getElementById('translateX').valueAsNumber,
+      document.getElementById('translateY').valueAsNumber,
+      document.getElementById('translateZ').valueAsNumber
+    ];
+
+    return shape;
+  };
+
+  var updateCamera = function(evt) {
+    var t, ry, rx, s, modelView;
+
+    if (evt.target.id === 'cameraCenter') {
+      _camera.theta = 0;
+      _camera.phi = 0;
+    }
+    if (evt.target.id === 'cameraUp') {
+      _camera.theta -= _cameraRotationInc;
+    }
+
+    if (evt.target.id === 'cameraDown') {
+      _camera.theta += _cameraRotationInc;
+    }
+
+    if (evt.target.id === 'cameraLeft') {
+      _camera.phi -= _cameraRotationInc;
+    }
+
+    if (evt.target.id === 'cameraRight') {
+      _camera.phi += _cameraRotationInc;
+    }
+
+    if (evt.target.id === 'zoomHome') {
+      _camera.sx = 1.0;
+      _camera.sy = 1.0;
+      _camera.sz = 1.0;
+    }
+
+    if (evt.target.id === 'zoomIn') {
+      _camera.sx += _cameraDZInc;
+      _camera.sy += _cameraDZInc;
+      _camera.sz += _cameraDZInc;
+    }
+
+    if (evt.target.id === 'zoomOut') {
+      _camera.sx -= _cameraDZInc;
+      _camera.sy -= _cameraDZInc;
+      _camera.sz -= _cameraDZInc;
+    }
+
+    ry = rotateY(_camera.phi);
+    rx = rotateX(_camera.theta);
+    s = genScaleMatrix(_camera.sx, _camera.sy, _camera.sz);
+
+    modelView = mat4();
+    modelView = mult(modelView, ry);
+    modelView = mult(modelView, rx);
+    modelView = mult(modelView, s);
+
+    _camera.modelViewMatrix = modelView;
 
     render();
-}
+  };
 
+  function update(evt) {
+    var shapeSelect = document.getElementById('shape');
+    var shapeType = shapeSelect.options[shapeSelect.selectedIndex].value;
 
-function render() {
+    if (evt.target.id === 'newShape' || evt.target.id === 'newShapeIcon') {
+      _editing = true;
 
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      DomUtils.enableInputs();
+      setDefaults();
+      edit();
 
-    eye = vec3(radius*Math.sin(theta)*Math.cos(phi),
-        radius*Math.sin(theta)*Math.sin(phi), radius*Math.cos(theta));
+      document.getElementById('newShape').classList.add( 'toggle' );
+      document.getElementById('commitShape').classList.remove( 'toggle' );
+      document.getElementById('addMessage').classList.add( 'toggle' );
+      document.getElementById('editMessage').classList.remove( 'toggle' );
+      document.getElementById('cameraControls').classList.add( 'toggle' );
 
-    modelViewMatrix = lookAt(eye, at , up);
-    projectionMatrix = ortho(left, right, bottom, ytop, near, far);
+    }
 
-    gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(projectionMatrix) );
+    if (evt.target.id === 'clear' || evt.target.id === 'clearIcon') {
+      _editing = true;
+      _shapes = [];
+      setDefaults();
+      edit();
+    }
 
-//   gl.drawArrays( gl.TRIANGLES, 0, index );
+  };
 
-    for( var i=0; i<index; i+=3)
-       gl.drawArrays( gl.LINE_LOOP, i, 3 );
+  var edit = function() {
+      var shapeSelect = document.getElementById('shape');
+      var shapeType = shapeSelect.options[shapeSelect.selectedIndex].value;
+      var shapeToEdit = addShape(shapeType);
 
-    window.requestAnimFrame(render);
+      shapeToEdit.border = addShape(shapeType, true);
+      render(_shapes, shapeToEdit);
+  };
 
+  var setDefaults = function() {
+    _camera = {
+      modelViewMatrix: mat4(),
+      theta: 0,
+      phi: 0,
+      dz: 0,
+      sx: 1,
+      sy: 1,
+      sz: 1
+    };
 
-}
+    document.getElementById('shape').value = 'Sphere';
+    document.getElementById('color').value = 0;
+
+    document.getElementById('rotateX').value = 60;
+    document.getElementById('rxv').value = 60;
+    document.getElementById('rotateY').value = 0;
+    document.getElementById('ryv').value = 0;
+    document.getElementById('rotateZ').value = 0;
+    document.getElementById('rzv').value = 0;
+
+    document.getElementById('scaleX').value = 0.2;
+    document.getElementById('sxv').value = 0.2;
+    document.getElementById('scaleY').value = 0.2;
+    document.getElementById('syv').value = 0.2;
+    document.getElementById('scaleZ').value = 0.2;
+    document.getElementById('szv').value = 0.2;
+
+    document.getElementById('translateX').value = 0;
+    document.getElementById('txv').value = 0;
+    document.getElementById('translateY').value = 0;
+    document.getElementById('tyv').value = 0;
+    document.getElementById('translateZ').value = 0;
+    document.getElementById('tzv').value = 0;
+  };
+
+  var App = {
+
+    init: function() {
+      // Setup canvas
+      _canvas = document.getElementById('gl-canvas');
+      gl = WebGLUtils.setupWebGL( _canvas, {preserveDrawingBuffer: true} );
+      if ( !gl ) { alert( 'WebGL isn\'t available' ); }
+
+      // Register event handlers
+      document.getElementById('settings').addEventListener('click', update);
+      document.getElementById('settings').addEventListener('change', edit);
+
+      // Configure WebGL
+      gl.viewport( 0, 0, _canvas.width, _canvas.height );
+      gl.clearColor(0.0, 0.5, 0.5, 1.0);
+      gl.enable(gl.DEPTH_TEST);
+      gl.enable(gl.CULL_FACE);
+
+      // Seed the system with one shape
+      setDefaults();
+      edit();
+    }
+  };
+
+  window.App = App;
+
+}(window, window.Shape));
+
+document.addEventListener('DOMContentLoaded', function() { App.init(); });

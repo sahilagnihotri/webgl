@@ -2,7 +2,6 @@
 
 (function(window, ShapeCommon) {
   var Sphere = {
-
     generate: function(opts) {
       var lats = 30,
         longs = 30,

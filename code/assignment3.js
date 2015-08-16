@@ -105,45 +105,6 @@
 
   var updateCamera = function(evt) {
     var t, ry, rx, s, modelView;
-
-    if (evt.target.id === 'cameraCenter') {
-      _camera.theta = 0;
-      _camera.phi = 0;
-    }
-    if (evt.target.id === 'cameraUp') {
-      _camera.theta -= _cameraRotationInc;
-    }
-
-    if (evt.target.id === 'cameraDown') {
-      _camera.theta += _cameraRotationInc;
-    }
-
-    if (evt.target.id === 'cameraLeft') {
-      _camera.phi -= _cameraRotationInc;
-    }
-
-    if (evt.target.id === 'cameraRight') {
-      _camera.phi += _cameraRotationInc;
-    }
-
-    if (evt.target.id === 'zoomHome') {
-      _camera.sx = 1.0;
-      _camera.sy = 1.0;
-      _camera.sz = 1.0;
-    }
-
-    if (evt.target.id === 'zoomIn') {
-      _camera.sx += _cameraDZInc;
-      _camera.sy += _cameraDZInc;
-      _camera.sz += _cameraDZInc;
-    }
-
-    if (evt.target.id === 'zoomOut') {
-      _camera.sx -= _cameraDZInc;
-      _camera.sy -= _cameraDZInc;
-      _camera.sz -= _cameraDZInc;
-    }
-
     ry = rotateY(_camera.phi);
     rx = rotateX(_camera.theta);
     s = genScaleMatrix(_camera.sx, _camera.sy, _camera.sz);
@@ -152,9 +113,7 @@
     modelView = mult(modelView, ry);
     modelView = mult(modelView, rx);
     modelView = mult(modelView, s);
-
     _camera.modelViewMatrix = modelView;
-
     render();
   };
 
@@ -254,7 +213,6 @@
       edit();
     }
   };
-
   window.App = App;
 
 }(window, window.Shape));

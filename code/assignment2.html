@@ -7,6 +7,7 @@
 <script id="vertex-shader" type="x-shader/x-vertex">
 attribute vec4 vPosition;
 attribute vec4 vColor;
+attribute float alpha;
 varying vec4 fColor;
 
 void main()
@@ -50,8 +51,6 @@ Color
     <option value = "5">Magenta</option>
     <option value = "6">Cyan</option>
 </select>
-<div>
-<!-- Line width  10 <input id="lineWidth" type="range" min=10 max=100 step=10 value=30/> 100 -->
  Line Width
  <select id = "lineWidth">
      <option value = "1">1</option>
@@ -71,7 +70,8 @@ Color
     <option value = "15">15</option>
     <option value = "16">16</option>
  </select>
-</div></br>
+ Transparency  0 <input id="transparency" type="range" min=0.0 max=1.0 step=0.1 value="0.8"/> 1
+</br>
 </div>
 </body>
 </html>

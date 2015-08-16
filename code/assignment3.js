@@ -148,6 +148,8 @@
          render(_shapes);
          document.getElementById("commitShape").disabled = true;
          document.getElementById("newShape").disabled = false;
+         editing = true;
+
        }
 
     if (evt.target.id === 'newShape' || evt.target.id === 'newShapeIcon') {

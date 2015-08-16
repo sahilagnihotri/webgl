@@ -146,35 +146,45 @@
          editing = false;
          _shapes.push(addShape(shapeType));
          render(_shapes);
-
-         document.getElementById('commitShape').classList.add( 'toggle' );
-         document.getElementById('newShape').classList.remove( 'toggle' );
-         document.getElementById('editMessage').classList.add( 'toggle' );
-         document.getElementById('addMessage').classList.remove( 'toggle' );
-         document.getElementById('cameraControls').classList.remove( 'toggle' );
-
-         DomUtils.disableInputs();
+         document.getElementById("commitShape").disabled = true;
+         document.getElementById("newShape").disabled = false;
        }
 
     if (evt.target.id === 'newShape' || evt.target.id === 'newShapeIcon') {
       editing = true;
-
-      DomUtils.enableInputs();
       setDefaults();
       edit();
-
-      document.getElementById('newShape').classList.add( 'toggle' );
-      document.getElementById('commitShape').classList.remove( 'toggle' );
-      document.getElementById('addMessage').classList.add( 'toggle' );
-      document.getElementById('editMessage').classList.remove( 'toggle' );
-      document.getElementById('cameraControls').classList.add( 'toggle' );
-
+      document.getElementById("commitShape").disabled = false;
+      document.getElementById("newShape").disabled = true;
     }
 
     if (evt.target.id === 'clear' || evt.target.id === 'clearIcon') {
       editing = true;
       _shapes = [];
       setDefaults();
+      document.getElementById("newShape").disabled = true;
+      document.getElementById("commitShape").disabled = false;
+
+      document.getElementById('shape').value = 'Sphere';
+      document.getElementById('color').value = 0;
+      document.getElementById('rotateX').value = 60;
+      document.getElementById('rxv').value = 60;
+      document.getElementById('rotateY').value = 0;
+      document.getElementById('ryv').value = 0;
+      document.getElementById('rotateZ').value = 0;
+      document.getElementById('rzv').value = 0;
+      document.getElementById('scaleX').value = 0.2;
+      document.getElementById('sxv').value = 0.2;
+      document.getElementById('scaleY').value = 0.2;
+      document.getElementById('syv').value = 0.2;
+      document.getElementById('scaleZ').value = 0.2;
+      document.getElementById('szv').value = 0.2;
+      document.getElementById('translateX').value = 0;
+      document.getElementById('txv').value = 0;
+      document.getElementById('translateY').value = 0;
+      document.getElementById('tyv').value = 0;
+      document.getElementById('translateZ').value = 0;
+      document.getElementById('tzv').value = 0;
       edit();
     }
 
@@ -201,30 +211,7 @@
       sy: 1,
       sz: 1
     };
-
-    document.getElementById('shape').value = 'Sphere';
-    document.getElementById('color').value = 0;
-
-    document.getElementById('rotateX').value = 60;
-    document.getElementById('rxv').value = 60;
-    document.getElementById('rotateY').value = 0;
-    document.getElementById('ryv').value = 0;
-    document.getElementById('rotateZ').value = 0;
-    document.getElementById('rzv').value = 0;
-
-    document.getElementById('scaleX').value = 0.2;
-    document.getElementById('sxv').value = 0.2;
-    document.getElementById('scaleY').value = 0.2;
-    document.getElementById('syv').value = 0.2;
-    document.getElementById('scaleZ').value = 0.2;
-    document.getElementById('szv').value = 0.2;
-
-    document.getElementById('translateX').value = 0;
-    document.getElementById('txv').value = 0;
-    document.getElementById('translateY').value = 0;
-    document.getElementById('tyv').value = 0;
-    document.getElementById('translateZ').value = 0;
-    document.getElementById('tzv').value = 0;
+    document.getElementById("newShape").disabled = true;
   };
 
   var App = {
@@ -238,21 +225,6 @@
       // Register event handlers
       document.getElementById('settings').addEventListener('click', update);
       document.getElementById('settings').addEventListener('change', edit);
-
-  /*    document.getElementById("commitShape").onclick = function(event) {
-        console.log(event.target.value);
-        render(_shapes);
-        edit();
-      };
-
-      document.getElementById("newShape").onclick = function(event) {
-        console.log(event.target.value);
-        render(_shapes);
-        edit();
-        setDefaults();
-
-        };
-*/
 
       // Configure WebGL
       gl.viewport( 0, 0, _canvas.width, _canvas.height );

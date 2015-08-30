@@ -7,7 +7,8 @@
         longs = 30,
         radius = 1,
         vertices = [],
-        indices = [];
+        indices = [],
+        normals = [];
 
       for (var latNumber = 0; latNumber <= lats; ++latNumber) {
         for (var longNumber = 0; longNumber <= longs; ++longNumber) {
@@ -25,6 +26,12 @@
           vertices.push(radius * x);
           vertices.push(radius * y);
           vertices.push(radius * z);
+          normals.push(radius * x);
+          normals.push(radius * y);
+          normals.push(radius * z);
+      //    normals.push(1.0);
+//          normals.push(vec3(cross(subtract(vec3(y),vec3(x)), subtract(vec3(z),vec3(x)))));
+//          console.log(normals);
         }
       }
 
@@ -44,7 +51,8 @@
 
       return {
         v: vertices,
-        i: indices
+        i: indices,
+        n: normals
       };
     }
 
@@ -54,6 +62,7 @@
     generate: function() {
       var vertices = [],
         indices = [],
+        normals = [],
         bottomCap = [],
         topCap = [],
         n = 30,
@@ -131,7 +140,8 @@
 
       return {
         v: vertices,
-        i: indices
+        i: indices,
+        n: normals
       };
     }
 
@@ -142,6 +152,7 @@
     generate: function() {
       var vertices = [],
         indices = [],
+        normals = [],
         bottomCap = [],
         topPoint = [],
         n = 30,
@@ -186,11 +197,10 @@
 
       return {
         v: vertices,
-        i: indices
+        i: indices,
+        n: normals
       };
-
     }
-
   };
 
   var ShapeCommon = {
@@ -211,7 +221,6 @@
       }
       return vertices;
     }
-
   };
 
   window.ShapeCommon = ShapeCommon;

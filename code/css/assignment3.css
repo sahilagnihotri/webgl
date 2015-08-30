@@ -5,7 +5,7 @@
 
 #left {
     float:left;
-    width:100px;
+    width:200px;
 }
 
 #center {
@@ -16,5 +16,10 @@
 
 #right {
     float:right;
-    width:100px;
+    width:auto;
+}
+
+.textboxclass {
+height: 20px;
+width: 40px;
 }
